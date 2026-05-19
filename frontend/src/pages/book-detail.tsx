@@ -1,0 +1,243 @@
+import { useState, useEffect, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useBook, useUpdateBook, useDeleteBook } from "../hooks/use-books";
+import ProgressBar from "../components/book/progress-bar";
+import Rating from "../components/book/rating";
+import Notes from "../components/book/notes";
+import GenreSelect from "../components/ui/genre-select";
+import { Spinner, Button } from "../components/ui";
+import { toastSuccess, toastError } from "../lib/toast";
+import type { ReadingStatus } from "../types/book";
+
+const statusOptions: {
+  label: string;
+  value: ReadingStatus;
+  variant: "default" | "warning" | "success";
+}[] = [
+  { label: "Pendiente", value: "PENDING", variant: "default" },
+  { label: "Leyendo", value: "READING", variant: "warning" },
+  { label: "Leído", value: "COMPLETED", variant: "success" },
+];
+
+export default function BookDetail() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { data: userBook, isLoading } = useBook(id!);
+  const updateBook = useUpdateBook();
+  const deleteBook = useDeleteBook();
+
+  const [status, setStatus] = useState<ReadingStatus>("PENDING");
+  const [currentPage, setCurrentPage] = useState<number | null>(null);
+  const [rating, setRating] = useState<number | null>(null);
+  const [notes, setNotes] = useState<string | null>("");
+  const [genreIds, setGenreIds] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (userBook) {
+      setStatus(userBook.status);
+      setCurrentPage(userBook.current_page);
+      setRating(userBook.rating);
+      setNotes(userBook.notes);
+      setGenreIds(userBook.book.genres.map((g) => g.id));
+    }
+  }, [userBook]);
+
+  const hasChanges =
+    userBook &&
+    (status !== userBook.status ||
+      currentPage !== userBook.current_page ||
+      rating !== userBook.rating ||
+      notes !== userBook.notes ||
+      genreIds.join() !== userBook.book.genres.map((g) => g.id).join());
+
+  const handleSave = useCallback(async () => {
+    if (!id || !hasChanges) return;
+    setSaving(true);
+    try {
+      await updateBook.mutateAsync({
+        id,
+        data: {
+          status,
+          current_page: currentPage ?? undefined,
+          rating: rating ?? undefined,
+          notes: notes ?? undefined,
+          genre_ids: genreIds,
+          ...(status === "COMPLETED" ? {} : { finished_at: undefined }),
+          ...(status === "READING" && !userBook?.started_at
+            ? { started_at: new Date().toISOString() }
+            : {}),
+        },
+      });
+      toastSuccess("Cambios guardados");
+    } catch {
+      toastError("Error al guardar");
+    }
+    setSaving(false);
+  }, [
+    id,
+    status,
+    currentPage,
+    rating,
+    notes,
+    genreIds,
+    hasChanges,
+    updateBook,
+    userBook,
+  ]);
+
+  const handleDelete = async () => {
+    if (!id) return;
+    try {
+      await deleteBook.mutateAsync(id);
+      toastSuccess("Libro eliminado");
+      navigate("/library");
+    } catch {
+      toastError("Error al eliminar");
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-20">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (!userBook) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-20 text-center">
+        <p className="text-body-md text-muted">Libro no encontrado</p>
+        <Button
+          className="mt-4"
+          variant="outline"
+          onClick={() => navigate("/library")}
+        >
+          Volver a la biblioteca
+        </Button>
+      </div>
+    );
+  }
+
+  const { book } = userBook;
+  const totalPages = book.pages ?? 0;
+
+  return (
+    <div className="mx-auto max-w-3xl px-4 lg:px-6 py-6 lg:py-8">
+      <button
+        onClick={() => navigate("/library")}
+        className="text-caption text-muted hover:text-ink transition-colors mb-4"
+      >
+        ← Volver a biblioteca
+      </button>
+
+      <div className="flex flex-col sm:flex-row gap-6">
+        <div className="shrink-0 w-full sm:w-48 h-72 bg-surface-strong rounded-xl overflow-hidden">
+          {book.thumbnail ? (
+            <img
+              src={book.thumbnail}
+              alt={book.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-muted-soft">
+              <svg
+                className="w-12 h-12"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
+                />
+              </svg>
+            </div>
+          )}
+        </div>
+
+        <div className="flex-1 min-w-0 space-y-4">
+          <div>
+            <h1 className="font-display text-display-sm text-ink">
+              {book.title}
+            </h1>
+            <p className="text-title-sm text-muted mt-0.5">{book.author}</p>
+          </div>
+
+          <div className="flex gap-1.5 flex-wrap">
+            {statusOptions.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setStatus(opt.value)}
+                className={`rounded-pill px-3.5 py-1.5 text-caption-uppercase transition-colors ${
+                  status === opt.value
+                    ? "bg-primary text-white"
+                    : "bg-surface-strong text-muted hover:text-ink"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+
+          {status !== "PENDING" && totalPages > 0 && (
+            <ProgressBar
+              current={currentPage}
+              total={totalPages}
+              onChange={setCurrentPage}
+            />
+          )}
+
+          <GenreSelect value={genreIds} onChange={setGenreIds} minCount={1} />
+
+          <div>
+            <span className="text-caption font-medium text-body-strong block mb-1">
+              Calificación
+            </span>
+            <Rating value={rating} onChange={setRating} />
+          </div>
+
+          <Notes value={notes} onChange={setNotes} />
+
+          {book.description && (
+            <div>
+              <span className="text-caption font-medium text-body-strong block mb-1">
+                Descripción
+              </span>
+              <p className="text-body-sm text-body leading-relaxed">
+                {book.description}
+              </p>
+            </div>
+          )}
+
+          <div className="flex items-center gap-3 pt-2">
+            <Button
+              onClick={handleSave}
+              disabled={!hasChanges || saving || updateBook.isPending}
+            >
+              {saving ? "Guardando…" : "Guardar cambios"}
+            </Button>
+            {hasChanges && (
+              <Button
+                variant="outline"
+                onClick={() => navigate("/library")}
+              >
+                Descartar cambios
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              onClick={handleDelete}
+              disabled={deleteBook.isPending}
+            >
+              Eliminar
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
