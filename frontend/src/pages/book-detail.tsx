@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useBook, useUpdateBook, useDeleteBook } from "../hooks/use-books";
+import { useCreateNote, useDeleteNote } from "../hooks/use-notes";
 import ProgressBar from "../components/book/progress-bar";
 import Rating from "../components/book/rating";
 import Notes from "../components/book/notes";
@@ -25,11 +26,12 @@ export default function BookDetail() {
   const { data: userBook, isLoading } = useBook(id!);
   const updateBook = useUpdateBook();
   const deleteBook = useDeleteBook();
+  const createNote = useCreateNote(id!);
+  const deleteNote = useDeleteNote(id!);
 
   const [status, setStatus] = useState<ReadingStatus>("PENDING");
   const [currentPage, setCurrentPage] = useState<number | null>(null);
   const [rating, setRating] = useState<number | null>(null);
-  const [notes, setNotes] = useState<string | null>("");
   const [genreIds, setGenreIds] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
 
@@ -38,7 +40,6 @@ export default function BookDetail() {
       setStatus(userBook.status);
       setCurrentPage(userBook.current_page);
       setRating(userBook.rating);
-      setNotes(userBook.notes);
       setGenreIds(userBook.book.genres.map((g) => g.id));
     }
   }, [userBook]);
@@ -48,7 +49,6 @@ export default function BookDetail() {
     (status !== userBook.status ||
       currentPage !== userBook.current_page ||
       rating !== userBook.rating ||
-      notes !== userBook.notes ||
       genreIds.join() !== userBook.book.genres.map((g) => g.id).join());
 
   const handleSave = useCallback(async () => {
@@ -61,7 +61,6 @@ export default function BookDetail() {
           status,
           current_page: currentPage ?? undefined,
           rating: rating ?? undefined,
-          notes: notes ?? undefined,
           genre_ids: genreIds,
           ...(status === "COMPLETED" ? {} : { finished_at: undefined }),
           ...(status === "READING" && !userBook?.started_at
@@ -79,7 +78,6 @@ export default function BookDetail() {
     status,
     currentPage,
     rating,
-    notes,
     genreIds,
     hasChanges,
     updateBook,
@@ -94,6 +92,24 @@ export default function BookDetail() {
       navigate("/library");
     } catch {
       toastError("Error al eliminar");
+    }
+  };
+
+  const handleCreateNote = async (data: { content: string; page_number: number | null }) => {
+    try {
+      await createNote.mutateAsync(data);
+      toastSuccess("Nota agregada");
+    } catch {
+      toastError("Error al agregar nota");
+    }
+  };
+
+  const handleDeleteNote = async (noteId: string) => {
+    try {
+      await deleteNote.mutateAsync(noteId);
+      toastSuccess("Nota eliminada");
+    } catch {
+      toastError("Error al eliminar nota");
     }
   };
 
@@ -200,7 +216,13 @@ export default function BookDetail() {
             <Rating value={rating} onChange={setRating} />
           </div>
 
-          <Notes value={notes} onChange={setNotes} />
+          <Notes
+            notes={userBook.notes}
+            totalPages={totalPages}
+            onCreate={handleCreateNote}
+            onDelete={handleDeleteNote}
+            isPending={createNote.isPending}
+          />
 
           {book.description && (
             <div>
@@ -221,15 +243,12 @@ export default function BookDetail() {
               {saving ? "Guardando…" : "Guardar cambios"}
             </Button>
             {hasChanges && (
-              <Button
-                variant="outline"
-                onClick={() => navigate("/library")}
-              >
+              <Button variant="outline" onClick={() => navigate("/library")}>
                 Descartar cambios
               </Button>
             )}
             <Button
-              variant="ghost"
+              variant="destructive"
               onClick={handleDelete}
               disabled={deleteBook.isPending}
             >

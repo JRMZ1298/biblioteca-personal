@@ -30,6 +30,14 @@ const items = [
   { fill: '#e8b8c4', stroke: '#c48e9e', size: 32, left: '48%', top: '70%', delay: '2.5s', dur: 'animate-float', rotate: '-3deg' },
   { fill: '#a7e5d3', stroke: '#6b9e8c', size: 24, left: '90%', top: '75%', delay: '4s', dur: 'animate-float-slow', rotate: '15deg' },
   { fill: '#c8b8e0', stroke: '#9a87b5', size: 34, left: '30%', top: '12%', delay: '5s', dur: 'animate-float', rotate: '-18deg' },
+  { fill: '#f4c5a8', stroke: '#c49a7e', size: 30, left: '55%', top: '38%', delay: '1.2s', dur: 'animate-float', rotate: '-8deg' },
+  { fill: '#a8c8e8', stroke: '#7a9fc4', size: 22, left: '5%', top: '80%', delay: '3.5s', dur: 'animate-float-slow', rotate: '10deg' },
+  { fill: '#e8b8c4', stroke: '#c48e9e', size: 38, left: '65%', top: '10%', delay: '4.5s', dur: 'animate-float', rotate: '5deg' },
+  { fill: '#a7e5d3', stroke: '#6b9e8c', size: 26, left: '40%', top: '45%', delay: '0.5s', dur: 'animate-float-slow', rotate: '-10deg' },
+  { fill: '#c8b8e0', stroke: '#9a87b5', size: 42, left: '15%', top: '40%', delay: '6s', dur: 'animate-float', rotate: '12deg' },
+  { fill: '#f4c5a8', stroke: '#c49a7e', size: 20, left: '75%', top: '45%', delay: '2s', dur: 'animate-float-slow', rotate: '-5deg' },
+  { fill: '#a8c8e8', stroke: '#7a9fc4', size: 35, left: '50%', top: '85%', delay: '5.5s', dur: 'animate-float', rotate: '7deg' },
+  { fill: '#e8b8c4', stroke: '#c48e9e', size: 28, left: '35%', top: '25%', delay: '7s', dur: 'animate-float-slow', rotate: '-15deg' },
 ]
 
 export default function AuthBackground() {

@@ -5,6 +5,14 @@ export interface Genre {
   name: string
 }
 
+export interface Note {
+  id: string
+  user_book_id: string
+  content: string
+  page_number: number | null
+  created_at: string
+}
+
 export interface Book {
   id: string
   title: string
@@ -28,7 +36,12 @@ export interface UserBook {
   started_at: string | null
   finished_at: string | null
   rating: number | null
-  notes: string | null
+  notes: Note[]
+}
+
+export interface CreateNoteRequest {
+  content: string
+  page_number?: number | null
 }
 
 export interface CreateBookRequest {
@@ -46,7 +59,6 @@ export interface UpdateBookRequest {
   status?: ReadingStatus
   current_page?: number
   rating?: number
-  notes?: string
   started_at?: string
   finished_at?: string
   genre_ids?: string[]

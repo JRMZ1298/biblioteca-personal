@@ -3,7 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { useBooks } from "../hooks/use-books";
 import BookCard from "../components/book/book-card";
 import BookForm from "../components/book/book-form";
-import { Modal, EmptyState, Button, Input, BookCardSkeleton } from "../components/ui";
+import {
+  Modal,
+  EmptyState,
+  Button,
+  Input,
+  BookCardSkeleton,
+} from "../components/ui";
 import type { ReadingStatus } from "../types/book";
 
 const statusFilters: { label: string; value: ReadingStatus | undefined }[] = [
@@ -84,7 +90,7 @@ export default function Library() {
           }
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-x-lg gap-y-section items-start">
+        <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-x-lg gap-y-[40px] items-start">
           {filtered.map((ub, i) => (
             <BookCard
               key={ub.id}

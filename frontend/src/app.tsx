@@ -44,7 +44,13 @@ export default function App() {
     <AuthProvider>
       <div className="relative min-h-screen bg-canvas font-sans text-body-md text-ink overflow-hidden">
         <AuthBackground />
-        <Toaster position="top-right" />
+        <Toaster
+          position="top-right"
+          options={{
+            fill: "#171717",
+            styles: { description: "text-white/75!" },
+          }}
+        />
         <ErrorBoundary>
           <AppRoutes />
         </ErrorBoundary>

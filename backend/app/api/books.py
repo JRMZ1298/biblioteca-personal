@@ -21,7 +21,10 @@ def list_books(
 ):
     stmt = (
         select(UserBook)
-        .options(selectinload(UserBook.book).selectinload(Book.genres))
+        .options(
+            selectinload(UserBook.book).selectinload(Book.genres),
+            selectinload(UserBook.notes),
+        )
         .where(UserBook.user_id == current_user.id)
     )
     if status:
@@ -39,7 +42,10 @@ def get_book(
 ):
     stmt = (
         select(UserBook)
-        .options(selectinload(UserBook.book).selectinload(Book.genres))
+        .options(
+            selectinload(UserBook.book).selectinload(Book.genres),
+            selectinload(UserBook.notes),
+        )
         .where(UserBook.id == book_id, UserBook.user_id == current_user.id)
     )
     user_book = db.execute(stmt).scalar_one_or_none()
@@ -106,7 +112,10 @@ def update_book(
 ):
     stmt = (
         select(UserBook)
-        .options(selectinload(UserBook.book).selectinload(Book.genres))
+        .options(
+            selectinload(UserBook.book).selectinload(Book.genres),
+            selectinload(UserBook.notes),
+        )
         .where(UserBook.id == book_id, UserBook.user_id == current_user.id)
     )
     user_book = db.execute(stmt).scalar_one_or_none()

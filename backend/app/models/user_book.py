@@ -17,7 +17,6 @@ class UserBook(Base):
     started_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     finished_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     rating: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
-    notes: Mapped[Optional[str]] = mapped_column(String(2000), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
@@ -26,6 +25,7 @@ class UserBook(Base):
 
     user: Mapped["User"] = relationship(back_populates="user_books")
     book: Mapped["Book"] = relationship(back_populates="user_books")
+    notes: Mapped[list["Note"]] = relationship(back_populates="user_book", cascade="all, delete-orphan", order_by="Note.created_at")
 
     __table_args__ = (
         UniqueConstraint("user_id", "book_id", name="uq_user_book"),

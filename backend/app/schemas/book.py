@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Optional
 
 from app.schemas.genre import GenreOut
+from app.schemas.note import NoteOut
 
 
 class BookOut(BaseModel):
@@ -32,7 +33,7 @@ class UserBookOut(BaseModel):
     started_at: Optional[datetime] = None
     finished_at: Optional[datetime] = None
     rating: Optional[float] = None
-    notes: Optional[str] = None
+    notes: list[NoteOut] = []
 
 
 class CreateBookRequest(BaseModel):
@@ -50,7 +51,6 @@ class UpdateBookRequest(BaseModel):
     status: Optional[str] = None
     current_page: Optional[int] = None
     rating: Optional[float] = None
-    notes: Optional[str] = None
     started_at: Optional[datetime] = None
     finished_at: Optional[datetime] = None
     genre_ids: Optional[list[str]] = None

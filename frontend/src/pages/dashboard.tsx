@@ -36,7 +36,7 @@ const metrics: MetricDef[] = [
 function StatCard({ label, value, color }: { label: string; value: string | number; color: string }) {
   return (
     <Card className="flex flex-col gap-1">
-      <span className="text-caption-uppercase text-muted truncate">{label}</span>
+      <span className="text-caption-uppercase text-muted">{label}</span>
       <span className={`font-display text-display-sm leading-none ${color}`}>{value}</span>
     </Card>
   )
@@ -132,6 +132,47 @@ export default function Dashboard() {
             </SectionCard>
           )}
 
+          {topAuthors && topAuthors.length > 0 ? (
+            <SectionCard title="Autores más leídos">
+              <div className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={topAuthors}
+                    margin={{ top: 8, right: 8, bottom: 8, left: -16 }}
+                    layout="vertical"
+                  >
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke={CHART_COLORS.hairline}
+                      horizontal={false}
+                    />
+                    <XAxis type="number" {...CHART_AXIS_STYLES} />
+                    <YAxis
+                      dataKey="author"
+                      type="category"
+                      tick={{ fontSize: 12, fill: CHART_COLORS.ink }}
+                      axisLine={false}
+                      tickLine={false}
+                      width={120}
+                    />
+                    <Tooltip content={<ChartTooltip unit="libros" />} />
+                    <Bar
+                      dataKey="count"
+                      fill={CHART_COLORS.ink}
+                      radius={[0, 4, 4, 0]}
+                      barSize={20}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </SectionCard>
+          ) : (
+            <Card className="p-6">
+              <h2 className="font-display text-title-md text-ink mb-4">Autores más leídos</h2>
+              <EmptyState title="Sin datos" description="No hay autores registrados aún." />
+            </Card>
+          )}
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {favoriteGenres && favoriteGenres.length > 0 ? (
               <SectionCard title="Géneros favoritos">
@@ -167,47 +208,6 @@ export default function Dashboard() {
               <Card className="p-6">
                 <h2 className="font-display text-title-md text-ink mb-4">Géneros favoritos</h2>
                 <EmptyState title="Sin datos" description="No hay géneros registrados aún." />
-              </Card>
-            )}
-
-            {topAuthors && topAuthors.length > 0 ? (
-              <SectionCard title="Autores más leídos">
-                <div className="h-72">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={topAuthors}
-                      margin={{ top: 8, right: 8, bottom: 8, left: -16 }}
-                      layout="vertical"
-                    >
-                      <CartesianGrid
-                        strokeDasharray="3 3"
-                        stroke={CHART_COLORS.hairline}
-                        horizontal={false}
-                      />
-                      <XAxis type="number" {...CHART_AXIS_STYLES} />
-                      <YAxis
-                        dataKey="author"
-                        type="category"
-                        tick={{ fontSize: 12, fill: CHART_COLORS.ink }}
-                        axisLine={false}
-                        tickLine={false}
-                        width={120}
-                      />
-                      <Tooltip content={<ChartTooltip unit="libros" />} />
-                      <Bar
-                        dataKey="count"
-                        fill={CHART_COLORS.ink}
-                        radius={[0, 4, 4, 0]}
-                        barSize={20}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </SectionCard>
-            ) : (
-              <Card className="p-6">
-                <h2 className="font-display text-title-md text-ink mb-4">Autores más leídos</h2>
-                <EmptyState title="Sin datos" description="No hay autores registrados aún." />
               </Card>
             )}
 
