@@ -37,6 +37,7 @@ export interface UserBook {
   finished_at: string | null
   rating: number | null
   notes: Note[]
+  created_at: string
 }
 
 export interface CreateNoteRequest {

@@ -23,21 +23,21 @@ function BookSVG({ fill, stroke, className, children }: BookProps) {
 }
 
 const items = [
-  { fill: '#a7e5d3', stroke: '#6b9e8c', size: 36, left: '8%', top: '18%', delay: '0s', dur: 'animate-float', rotate: '-12deg' },
-  { fill: '#c8b8e0', stroke: '#9a87b5', size: 44, left: '82%', top: '22%', delay: '1.5s', dur: 'animate-float-slow', rotate: '8deg' },
-  { fill: '#f4c5a8', stroke: '#c49a7e', size: 28, left: '18%', top: '55%', delay: '3s', dur: 'animate-float-slow', rotate: '6deg' },
-  { fill: '#a8c8e8', stroke: '#7a9fc4', size: 40, left: '72%', top: '60%', delay: '0.8s', dur: 'animate-float', rotate: '-6deg' },
-  { fill: '#e8b8c4', stroke: '#c48e9e', size: 32, left: '48%', top: '70%', delay: '2.5s', dur: 'animate-float', rotate: '-3deg' },
-  { fill: '#a7e5d3', stroke: '#6b9e8c', size: 24, left: '90%', top: '75%', delay: '4s', dur: 'animate-float-slow', rotate: '15deg' },
-  { fill: '#c8b8e0', stroke: '#9a87b5', size: 34, left: '30%', top: '12%', delay: '5s', dur: 'animate-float', rotate: '-18deg' },
-  { fill: '#f4c5a8', stroke: '#c49a7e', size: 30, left: '55%', top: '38%', delay: '1.2s', dur: 'animate-float', rotate: '-8deg' },
-  { fill: '#a8c8e8', stroke: '#7a9fc4', size: 22, left: '5%', top: '80%', delay: '3.5s', dur: 'animate-float-slow', rotate: '10deg' },
-  { fill: '#e8b8c4', stroke: '#c48e9e', size: 38, left: '65%', top: '10%', delay: '4.5s', dur: 'animate-float', rotate: '5deg' },
-  { fill: '#a7e5d3', stroke: '#6b9e8c', size: 26, left: '40%', top: '45%', delay: '0.5s', dur: 'animate-float-slow', rotate: '-10deg' },
-  { fill: '#c8b8e0', stroke: '#9a87b5', size: 42, left: '15%', top: '40%', delay: '6s', dur: 'animate-float', rotate: '12deg' },
-  { fill: '#f4c5a8', stroke: '#c49a7e', size: 20, left: '75%', top: '45%', delay: '2s', dur: 'animate-float-slow', rotate: '-5deg' },
-  { fill: '#a8c8e8', stroke: '#7a9fc4', size: 35, left: '50%', top: '85%', delay: '5.5s', dur: 'animate-float', rotate: '7deg' },
-  { fill: '#e8b8c4', stroke: '#c48e9e', size: 28, left: '35%', top: '25%', delay: '7s', dur: 'animate-float-slow', rotate: '-15deg' },
+  { fill: '#a7e5d3', stroke: '#6b9e8c', size: 36, left: '8%', top: '18%', delay: '0s', rotate: '-12deg', responsive: '' },
+  { fill: '#c8b8e0', stroke: '#9a87b5', size: 44, left: '82%', top: '22%', delay: '1.5s', rotate: '8deg', responsive: '' },
+  { fill: '#f4c5a8', stroke: '#c49a7e', size: 28, left: '18%', top: '55%', delay: '3s', rotate: '6deg', responsive: '' },
+  { fill: '#a8c8e8', stroke: '#7a9fc4', size: 40, left: '72%', top: '60%', delay: '0.8s', rotate: '-6deg', responsive: '' },
+  { fill: '#e8b8c4', stroke: '#c48e9e', size: 32, left: '48%', top: '70%', delay: '2.5s', rotate: '-3deg', responsive: '' },
+  { fill: '#a7e5d3', stroke: '#6b9e8c', size: 24, left: '90%', top: '75%', delay: '4s', rotate: '15deg', responsive: 'hidden md:block' },
+  { fill: '#c8b8e0', stroke: '#9a87b5', size: 34, left: '30%', top: '12%', delay: '5s', rotate: '-18deg', responsive: 'hidden md:block' },
+  { fill: '#f4c5a8', stroke: '#c49a7e', size: 30, left: '55%', top: '38%', delay: '1.2s', rotate: '-8deg', responsive: 'hidden lg:block' },
+  { fill: '#a8c8e8', stroke: '#7a9fc4', size: 22, left: '5%', top: '80%', delay: '3.5s', rotate: '10deg', responsive: 'hidden lg:block' },
+  { fill: '#e8b8c4', stroke: '#c48e9e', size: 38, left: '65%', top: '10%', delay: '4.5s', rotate: '5deg', responsive: 'hidden lg:block' },
+  { fill: '#a7e5d3', stroke: '#6b9e8c', size: 26, left: '40%', top: '45%', delay: '0.5s', rotate: '-10deg', responsive: 'hidden lg:block' },
+  { fill: '#c8b8e0', stroke: '#9a87b5', size: 42, left: '15%', top: '40%', delay: '6s', rotate: '12deg', responsive: 'hidden lg:block' },
+  { fill: '#f4c5a8', stroke: '#c49a7e', size: 20, left: '75%', top: '45%', delay: '2s', rotate: '-5deg', responsive: 'hidden lg:block' },
+  { fill: '#a8c8e8', stroke: '#7a9fc4', size: 35, left: '50%', top: '85%', delay: '5.5s', rotate: '7deg', responsive: 'hidden lg:block' },
+  { fill: '#e8b8c4', stroke: '#c48e9e', size: 28, left: '35%', top: '25%', delay: '7s', rotate: '-15deg', responsive: 'hidden lg:block' },
 ]
 
 export default function AuthBackground() {
@@ -46,7 +46,7 @@ export default function AuthBackground() {
       {items.map((book, i) => (
         <div
           key={i}
-          className={`absolute ${book.dur}`}
+          className={`absolute animate-float ${book.responsive}`}
           style={{
             left: book.left,
             top: book.top,
@@ -55,6 +55,7 @@ export default function AuthBackground() {
             animationDelay: book.delay,
             transform: `rotate(${book.rotate})`,
             opacity: 0.3,
+            animationDuration: i < 5 ? '6s' : i < 7 ? '8s' : '7s',
           }}
         >
           <BookSVG fill={book.fill} stroke={book.stroke} />

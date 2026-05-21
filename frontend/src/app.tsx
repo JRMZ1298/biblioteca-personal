@@ -5,6 +5,7 @@ import { Toaster } from "sileo";
 import ErrorBoundary from "./components/error-boundary";
 import AuthBackground from "./components/auth/auth-background";
 import TopNav from "./components/layout/top-nav";
+import BottomNav from "./components/layout/bottom-nav";
 import Login from "./pages/login";
 import Register from "./pages/register";
 import Library from "./pages/library";
@@ -16,9 +17,10 @@ function ProtectedLayout() {
   return (
     <AuthGuard>
       <TopNav />
-      <div className="animate-fade-in">
+      <div className="animate-fade-in pb-16 md:pb-0">
         <Outlet />
       </div>
+      <BottomNav />
     </AuthGuard>
   );
 }

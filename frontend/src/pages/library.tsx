@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBooks } from "../hooks/use-books";
 import BookCard from "../components/book/book-card";
@@ -10,7 +10,10 @@ import {
   Input,
   BookCardSkeleton,
 } from "../components/ui";
-import type { ReadingStatus } from "../types/book";
+import type { ReadingStatus, UserBook } from "../types/book";
+
+type SortKey = "title" | "pages" | "created_at";
+type SortDir = "asc" | "desc";
 
 const statusFilters: { label: string; value: ReadingStatus | undefined }[] = [
   { label: "Todos", value: undefined },
@@ -19,20 +22,51 @@ const statusFilters: { label: string; value: ReadingStatus | undefined }[] = [
   { label: "Leído", value: "COMPLETED" },
 ];
 
+const sortOptions: { label: string; key: SortKey }[] = [
+  { label: "Título", key: "title" },
+  { label: "Páginas", key: "pages" },
+  { label: "Fecha", key: "created_at" },
+];
+
 export default function Library() {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<ReadingStatus | undefined>(undefined);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [sortKey, setSortKey] = useState<SortKey>("created_at");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
 
   const { data: books, isLoading } = useBooks(filter);
 
-  const filtered = (books ?? []).filter(
-    (ub) =>
-      !search ||
-      ub.book.title.toLowerCase().includes(search.toLowerCase()) ||
-      ub.book.author.toLowerCase().includes(search.toLowerCase()),
-  );
+  const sorted = useMemo(() => {
+    const list = (books ?? []).filter(
+      (ub) =>
+        !search ||
+        ub.book.title.toLowerCase().includes(search.toLowerCase()) ||
+        ub.book.author.toLowerCase().includes(search.toLowerCase()),
+    );
+
+    return [...list].sort((a: UserBook, b: UserBook) => {
+      let cmp = 0;
+      if (sortKey === "title") {
+        cmp = a.book.title.localeCompare(b.book.title);
+      } else if (sortKey === "pages") {
+        cmp = (a.book.pages ?? 0) - (b.book.pages ?? 0);
+      } else {
+        cmp = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      }
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+  }, [books, search, sortKey, sortDir]);
+
+  function toggleSort(key: SortKey) {
+    if (sortKey === key) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir(key === "created_at" ? "desc" : "asc");
+    }
+  }
 
   return (
     <div className="mx-auto max-w-5xl px-4 lg:px-6 py-6 lg:py-8">
@@ -50,7 +84,30 @@ export default function Library() {
           />
         </div>
 
-        <div className="flex gap-1.5 flex-wrap">
+        <div className="flex gap-1.5 flex-wrap items-center">
+          {sortOptions.map((opt) => (
+            <button
+              key={opt.key}
+              onClick={() => toggleSort(opt.key)}
+              className={`rounded-pill px-3 py-1.5 text-caption-uppercase transition-colors flex items-center gap-1 ${
+                sortKey === opt.key
+                  ? "bg-primary text-white"
+                  : "bg-surface-strong text-muted hover:text-ink"
+              }`}
+            >
+              {opt.label}
+              {sortKey === opt.key && (
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth={2}>
+                  {sortDir === "asc" ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 9L2 5h8L6 9z" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 3L2 7h8L6 3z" />
+                  )}
+                </svg>
+              )}
+            </button>
+          ))}
+          <span className="hidden sm:block w-px h-5 bg-hairline mx-1" />
           {statusFilters.map((f) => (
             <button
               key={f.label}
@@ -68,12 +125,12 @@ export default function Library() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-x-lg gap-y-section items-start">
+        <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-x-lg gap-y-[40px] items-start">
           {Array.from({ length: 10 }).map((_, i) => (
             <BookCardSkeleton key={i} index={i} />
           ))}
         </div>
-      ) : filtered.length === 0 ? (
+      ) : sorted.length === 0 ? (
         <EmptyState
           title={
             search || filter ? "Sin resultados" : "Tu biblioteca está vacía"
@@ -91,7 +148,7 @@ export default function Library() {
         />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-x-lg gap-y-[40px] items-start">
-          {filtered.map((ub, i) => (
+          {sorted.map((ub, i) => (
             <BookCard
               key={ub.id}
               userBook={ub}
