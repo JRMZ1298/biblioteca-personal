@@ -34,6 +34,7 @@ class UserBookOut(BaseModel):
     finished_at: Optional[datetime] = None
     rating: Optional[float] = None
     notes: list[NoteOut] = []
+    created_at: datetime
 
 
 class CreateBookRequest(BaseModel):
