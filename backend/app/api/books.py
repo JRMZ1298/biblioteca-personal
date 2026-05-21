@@ -122,6 +122,20 @@ def update_book(
     if not user_book:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book not found")
 
+    if data.current_page is not None and user_book.book.pages is not None:
+        if data.current_page > user_book.book.pages:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Current page ({data.current_page}) cannot exceed total pages ({user_book.book.pages})",
+            )
+
+    target_status = data.status if data.status is not None else user_book.status
+    if data.finished_at is not None and target_status != "COMPLETED":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="finished_at can only be set when status is COMPLETED",
+        )
+
     update_data = data.model_dump(exclude_unset=True)
     genre_ids = update_data.pop("genre_ids", None)
 

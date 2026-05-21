@@ -1,23 +1,32 @@
-import type { UserBook } from '../../types/book'
+import type { UserBook } from "../../types/book";
 
 const statusConfig: Record<string, { label: string; className: string }> = {
-  PENDING: { label: 'Pendiente', className: 'text-muted' },
-  READING: { label: 'Leyendo', className: 'text-amber-600' },
-  COMPLETED: { label: 'Leído', className: 'text-emerald-600' },
-}
+  PENDING: { label: "Pendiente", className: "text-blue-500" },
+  READING: { label: "Leyendo", className: "text-amber-500" },
+  COMPLETED: { label: "Leído", className: "text-emerald-600" },
+};
 
 interface BookCardProps {
-  userBook: UserBook
-  onClick?: () => void
-  index?: number
+  userBook: UserBook;
+  onClick?: () => void;
+  index?: number;
 }
 
-function BookCardCompact({ userBook, onClick }: { userBook: UserBook; onClick?: () => void }) {
-  const { book, status } = userBook
-  const config = statusConfig[status]
+function BookCardCompact({
+  userBook,
+  onClick,
+}: {
+  userBook: UserBook;
+  onClick?: () => void;
+}) {
+  const { book, status } = userBook;
+  const config = statusConfig[status];
 
   return (
-    <article className="flex gap-3 group cursor-pointer md:hidden" onClick={onClick}>
+    <article
+      className="flex gap-3 group cursor-pointer md:hidden"
+      onClick={onClick}
+    >
       <div className="relative shrink-0 w-14 h-20 rounded-md overflow-hidden border border-hairline bg-surface-strong">
         {book.thumbnail ? (
           <img
@@ -36,27 +45,35 @@ function BookCardCompact({ userBook, onClick }: { userBook: UserBook; onClick?: 
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-1">
-          <h3 className="font-body-md text-body-md text-ink truncate">{book.title}</h3>
-          <span className={`shrink-0 text-[9px] uppercase tracking-widest font-semibold ${config.className}`}>
+          <h3 className="font-body-md text-body-md text-ink truncate">
+            {book.title}
+          </h3>
+          <span
+            className={`shrink-0 text-[9px] uppercase tracking-widest font-semibold ${config.className}`}
+          >
             {config.label}
           </span>
         </div>
         <p className="text-body-sm text-muted truncate mt-0.5">{book.author}</p>
       </div>
     </article>
-  )
+  );
 }
 
-export default function BookCard({ userBook, onClick, index = 0 }: BookCardProps) {
-  const { book, status } = userBook
-  const config = statusConfig[status]
-  const isEven = index % 2 === 0
+export default function BookCard({
+  userBook,
+  onClick,
+  index = 0,
+}: BookCardProps) {
+  const { book, status } = userBook;
+  const config = statusConfig[status];
+  const isEven = index % 2 === 0;
 
   return (
     <>
       <BookCardCompact userBook={userBook} onClick={onClick} />
       <article
-        className={`hidden md:flex flex-col gap-md group cursor-pointer ${isEven ? '' : 'md:mt-12'}`}
+        className={`hidden md:flex flex-col gap-md group cursor-pointer ${isEven ? "" : "md:mt-12"}`}
         onClick={onClick}
       >
         <div className="relative w-full aspect-[2/3] rounded-lg overflow-hidden border border-hairline bg-surface-strong">
@@ -75,7 +92,7 @@ export default function BookCard({ userBook, onClick, index = 0 }: BookCardProps
             </div>
           )}
           <div
-            className={`absolute top-sm right-sm bg-surface-card/90 backdrop-blur-sm px-xs py-xxs rounded text-[10px] uppercase tracking-widest font-semibold border border-hairline ${config.className}`}
+            className={`absolute top-sm right-sm bg-gray-800/90 backdrop-blur-sm px-xs py-xxs rounded text-[10px] uppercase tracking-widest font-semibold border border-hairline ${config.className}`}
           >
             {config.label}
           </div>
@@ -88,5 +105,5 @@ export default function BookCard({ userBook, onClick, index = 0 }: BookCardProps
         </div>
       </article>
     </>
-  )
+  );
 }

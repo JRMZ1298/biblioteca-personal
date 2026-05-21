@@ -27,7 +27,7 @@ export default function ChartTooltip({
 }: ChartTooltipProps) {
   if (!active || !payload?.length) return null
   return (
-    <div className="rounded-lg border border-hairline bg-white px-3 py-2 shadow-card text-caption">
+    <div className="rounded-lg border border-hairline bg-surface-card px-3 py-2 shadow-card text-caption">
       <span className="font-medium text-ink">
         {formatLabel ? formatLabel(label ?? '') : label}
       </span>
@@ -48,7 +48,7 @@ interface ChartTooltipContentProps {
 export function NameValueTooltip({ active, payload }: ChartTooltipContentProps) {
   if (!active || !payload?.length) return null
   return (
-    <div className="rounded-lg border border-hairline bg-white px-3 py-2 shadow-card text-caption">
+    <div className="rounded-lg border border-hairline bg-surface-card px-3 py-2 shadow-card text-caption">
       {payload.map((entry, i) => (
         <div key={i} className="flex items-center gap-2">
           <span className="text-ink font-medium">{entry.name}</span>

@@ -1,3 +1,117 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --color-primary: #292524;
+  --color-primary-active: #0c0a09;
+  --color-ink: #0c0a09;
+  --color-body: #4e4e4e;
+  --color-body-strong: #292524;
+  --color-muted: #777169;
+  --color-muted-soft: #a8a29e;
+  --color-hairline: #e7e5e4;
+  --color-hairline-soft: #f0efed;
+  --color-hairline-strong: #d6d3d1;
+  --color-canvas: #f5f5f5;
+  --color-canvas-soft: #fafafa;
+  --color-canvas-deep: #0c0a09;
+  --color-surface-card: #ffffff;
+  --color-surface-strong: #f0efed;
+  --color-highlight: #ffffff;
+  --color-on-primary: #ffffff;
+  --color-on-dark: #ffffff;
+  --color-on-dark-soft: #a8a29e;
+}
+
+.dark {
+  --color-primary: #f5f5f5;
+  --color-primary-active: #ffffff;
+  --color-ink: #f5f5f5;
+  --color-body: #a3a3a3;
+  --color-body-strong: #e5e5e5;
+  --color-muted: #888888;
+  --color-muted-soft: #666666;
+  --color-hairline: #333333;
+  --color-hairline-soft: #2a2a2a;
+  --color-hairline-strong: #444444;
+  --color-canvas: #171717;
+  --color-canvas-soft: #1c1c1c;
+  --color-canvas-deep: #f5f5f5;
+  --color-surface-card: #1f1f1f;
+  --color-surface-strong: #2a2a2a;
+  --color-highlight: #292524;
+  --color-on-primary: #171717;
+  --color-on-dark: #0c0a09;
+  --color-on-dark-soft: #777169;
+}
+
+::view-transition-group(root) {
+  animation-timing-function: var(--expo-out);
+}
+::view-transition-new(root) {
+  mask: url("/custom-svg.svg") top left / 0 no-repeat;
+  mask-origin: top left;
+  animation: theme-scale 1.5s;
+  animation-fill-mode: both;
+}
+::view-transition-old(root),
+.dark::view-transition-old(root) {
+  animation: theme-scale 1.5s;
+  animation-fill-mode: both;
+  z-index: -1;
+  transform-origin: top left;
+}
+@keyframes theme-scale {
+  to {
+    mask-size: 200vmax;
+  }
+}
+
+:root {
+  --expo-in: linear(
+    0 0%,
+    0.0085 31.26%,
+    0.0167 40.94%,
+    0.0289 48.86%,
+    0.0471 55.92%,
+    0.0717 61.99%,
+    0.1038 67.32%,
+    0.1443 72.07%,
+    0.1989 76.7%,
+    0.2659 80.89%,
+    0.3465 84.71%,
+    0.4419 88.22%,
+    0.554 91.48%,
+    0.6835 94.51%,
+    0.8316 97.34%,
+    1 100%
+  );
+  --expo-out: linear(
+    0 0%,
+    0.1684 2.66%,
+    0.3165 5.49%,
+    0.446 8.52%,
+    0.5581 11.78%,
+    0.6535 15.29%,
+    0.7341 19.11%,
+    0.8011 23.3%,
+    0.8557 27.93%,
+    0.8962 32.68%,
+    0.9283 38.01%,
+    0.9529 44.08%,
+    0.9711 51.14%,
+    0.9833 59.06%,
+    0.9915 68.74%,
+    1 100%
+  );
+}
+
+*,
+*::before,
+*::after {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}

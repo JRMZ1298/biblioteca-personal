@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "motion/react";
 import { useBooks } from "../hooks/use-books";
 import BookCard from "../components/book/book-card";
 import BookForm from "../components/book/book-form";
@@ -53,7 +54,8 @@ export default function Library() {
       } else if (sortKey === "pages") {
         cmp = (a.book.pages ?? 0) - (b.book.pages ?? 0);
       } else {
-        cmp = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        cmp =
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
       }
       return sortDir === "asc" ? cmp : -cmp;
     });
@@ -91,17 +93,31 @@ export default function Library() {
               onClick={() => toggleSort(opt.key)}
               className={`rounded-pill px-3 py-1.5 text-caption-uppercase transition-colors flex items-center gap-1 ${
                 sortKey === opt.key
-                  ? "bg-primary text-white"
+                  ? "bg-primary text-highlight"
                   : "bg-surface-strong text-muted hover:text-ink"
               }`}
             >
               {opt.label}
               {sortKey === opt.key && (
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth={2}>
+                <svg
+                  className="w-3 h-3"
+                  fill="none"
+                  viewBox="0 0 12 12"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
                   {sortDir === "asc" ? (
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 9L2 5h8L6 9z" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 9L2 5h8L6 9z"
+                    />
                   ) : (
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 3L2 7h8L6 3z" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 3L2 7h8L6 3z"
+                    />
                   )}
                 </svg>
               )}
@@ -114,7 +130,7 @@ export default function Library() {
               onClick={() => setFilter(f.value)}
               className={`rounded-pill px-3.5 py-1.5 text-caption-uppercase transition-colors ${
                 filter === f.value
-                  ? "bg-primary text-white"
+                  ? "bg-primary text-highlight"
                   : "bg-surface-strong text-muted hover:text-ink"
               }`}
             >
@@ -147,16 +163,29 @@ export default function Library() {
           }
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-x-lg gap-y-[40px] items-start">
-          {sorted.map((ub, i) => (
-            <BookCard
-              key={ub.id}
-              userBook={ub}
-              index={i}
-              onClick={() => navigate(`/books/${ub.id}`)}
-            />
-          ))}
-        </div>
+        <motion.div
+          layout
+          className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-x-lg gap-y-[40px] items-start"
+        >
+          <AnimatePresence mode="popLayout">
+            {sorted.map((ub, i) => (
+              <motion.div
+                key={ub.id}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+              >
+                <BookCard
+                  userBook={ub}
+                  index={i}
+                  onClick={() => navigate(`/books/${ub.id}`)}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
       )}
 
       <Modal

@@ -30,7 +30,7 @@ export default function Login() {
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden">
       <div className="relative z-10 w-full max-w-sm px-4">
-        <div className="rounded-xl border border-hairline bg-white/90 backdrop-blur-sm p-6 shadow-card">
+          <div className="rounded-xl border border-hairline bg-surface-card/90 backdrop-blur-sm p-6 shadow-card">
           <div className="flex justify-center mb-4">
             <svg width="40" height="40" viewBox="0 0 40 40" fill="none" className="text-ink">
               <rect x="6" y="4" width="28" height="32" rx="2" stroke="currentColor" strokeWidth="1.5" fill="none" />

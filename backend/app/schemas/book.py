@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 from datetime import datetime
 from typing import Optional
 
@@ -55,3 +55,10 @@ class UpdateBookRequest(BaseModel):
     started_at: Optional[datetime] = None
     finished_at: Optional[datetime] = None
     genre_ids: Optional[list[str]] = None
+
+    @field_validator("rating")
+    @classmethod
+    def validate_rating(cls, v: Optional[float]) -> Optional[float]:
+        if v is not None and (v < 1 or v > 5):
+            raise ValueError("Rating must be between 1 and 5")
+        return v

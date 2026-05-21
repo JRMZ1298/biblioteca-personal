@@ -22,7 +22,7 @@ export default function Rating({ value, onChange, readonly }: RatingProps) {
             onMouseEnter={() => setHover(star)}
             className={`text-5xl transition-colors ${
               readonly ? "cursor-default" : "cursor-pointer"
-            } ${active ? "text-[#e8b83a]" : "text-gray-500 [text-shadow:_0_0_0_1px_#a8a29e] hover:text-[#e8b83a]/50"}`}
+            } ${active ? "text-[#e8b83a]" : "text-muted [text-shadow:_0_0_0_1px_#a8a29e] hover:text-[#e8b83a]/50"}`}
           >
             {active ? "★" : "☆"}
           </button>
