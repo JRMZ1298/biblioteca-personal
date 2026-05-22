@@ -1,0 +1,82 @@
+[
+  {
+    "title": "Cien Años de Soledad",
+    "author": "Gabriel García Márquez",
+    "description": "La historia de la familia Buendía en Macondo, un pueblo ficticio de Colombia.",
+    "pages": 496,
+    "published_date": "1967-05-30",
+    "google_books_id": null,
+    "genres": ["Realismo mágico", "Novela"],
+    "status": "COMPLETED",
+    "current_page": 496,
+    "rating": 5,
+    "started_at": "2025-01-10",
+    "finished_at": "2025-02-05",
+    "notes": [
+      { "content": "Inolvidable el realismo mágico de García Márquez", "page_number": null },
+      { "content": "El personaje de Aureliano es fascinante", "page_number": 120 }
+    ]
+  },
+  {
+    "title": "1984",
+    "author": "George Orwell",
+    "description": "Una distopía sobre un régimen totalitario que controla cada aspecto de la vida.",
+    "pages": 328,
+    "published_date": "1949-06-08",
+    "google_books_id": null,
+    "genres": ["Ciencia ficción", "Distopía"],
+    "status": "READING",
+    "current_page": 150,
+    "rating": null,
+    "started_at": "2026-05-01",
+    "finished_at": null,
+    "notes": []
+  },
+  {
+    "title": "El Principito",
+    "author": "Antoine de Saint-Exupéry",
+    "description": "Un piloto perdido en el desierto conoce a un pequeño príncipe de otro planeta.",
+    "pages": 96,
+    "published_date": "1943-04-06",
+    "google_books_id": null,
+    "genres": ["Infantil", "Filosofía"],
+    "status": "PENDING",
+    "current_page": null,
+    "rating": null,
+    "started_at": null,
+    "finished_at": null,
+    "notes": []
+  },
+  {
+    "title": "El Hobbit",
+    "author": "J.R.R. Tolkien",
+    "description": "Bilbo Bolsón emprende una aventura inesperada con un grupo de enanos.",
+    "pages": 310,
+    "published_date": "1937-09-21",
+    "google_books_id": null,
+    "genres": ["Fantasía", "Aventura"],
+    "status": "COMPLETED",
+    "current_page": 310,
+    "rating": 4,
+    "started_at": "2025-12-01",
+    "finished_at": "2025-12-20",
+    "notes": [
+      { "content": "Mejor de lo que esperaba", "page_number": null }
+    ]
+  },
+  {
+    "title": "Sapiens: De animales a dioses",
+    "author": "Yuval Noah Harari",
+    "description": "Una breve historia de la humanidad, desde la prehistoria hasta la era moderna.",
+    "pages": 512,
+    "published_date": "2011-01-01",
+    "google_books_id": null,
+    "genres": ["Historia", "Divulgación"],
+    "status": "PENDING",
+    "current_page": null,
+    "rating": null,
+    "started_at": null,
+    "finished_at": null,
+    "notes": []
+  }
+]

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { flushSync } from 'react-dom'
 
 function getInitialTheme(): boolean {
   if (typeof window === 'undefined') return false
@@ -13,6 +14,10 @@ function applyTheme(isDark: boolean) {
   localStorage.setItem('theme', isDark ? 'dark' : 'light')
 }
 
+function prefersReducedMotion(): boolean {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
 export function useTheme() {
   const [isDark, setIsDark] = useState(getInitialTheme)
 
@@ -21,14 +26,20 @@ export function useTheme() {
   }, [isDark])
 
   const toggle = useCallback(() => {
-    if (!document.startViewTransition) {
-      setIsDark((prev) => !prev)
+    const next = !isDark
+
+    if (!document.startViewTransition || prefersReducedMotion()) {
+      setIsDark(next)
       return
     }
+
     document.startViewTransition(() => {
-      setIsDark((prev) => !prev)
+      applyTheme(next)
+      flushSync(() => {
+        setIsDark(next)
+      })
     })
-  }, [])
+  }, [isDark])
 
   return { isDark, toggle }
 }

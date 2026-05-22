@@ -1,3 +1,4 @@
+from datetime import datetime, date, timedelta, timezone
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import select, func
@@ -9,6 +10,7 @@ from app.models.book import Book
 from app.models.user_book import UserBook
 from app.models.genre import Genre
 from app.models.book_genre import BookGenre
+from app.models.reading_log import ReadingLog
 from app.schemas.stats import OverviewStats, PagesPerMonth, FavoriteGenre, TopAuthor
 
 router = APIRouter()
@@ -52,29 +54,66 @@ def get_overview_stats(
     )
 
 
+def _fill_months(raw: list[tuple[str, int]]) -> list[PagesPerMonth]:
+    if not raw:
+        return []
+    months = sorted(r[0] for r in raw)
+    today = datetime.now(timezone.utc)
+    start = datetime.strptime(months[0] + "-01", "%Y-%m-%d")
+    end = datetime(today.year, today.month, 1)
+    if end < start:
+        end = start
+    lookup = dict(raw)
+    result = []
+    cursor = start
+    while cursor <= end:
+        key = cursor.strftime("%Y-%m")
+        result.append(PagesPerMonth(month=key, pages=lookup.get(key, 0)))
+        cursor += timedelta(days=32)
+        cursor = cursor.replace(day=1)
+    return result
+
+
 @router.get("/pages-per-month", response_model=list[PagesPerMonth])
 def get_pages_per_month(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    month_col = month_format_func(UserBook.finished_at)
+    log_month = month_format_func(ReadingLog.date)
     stmt = (
         select(
-            month_col.label("month"),
-            func.sum(Book.pages).label("pages"),
+            log_month.label("month"),
+            func.sum(ReadingLog.pages_read).label("pages"),
         )
-        .join(Book, UserBook.book_id == Book.id)
-        .where(
-            UserBook.user_id == current_user.id,
-            UserBook.status == "COMPLETED",
-            UserBook.finished_at.isnot(None),
-            Book.pages.isnot(None),
-        )
-        .group_by(month_col)
-        .order_by(month_col)
+        .join(UserBook, ReadingLog.user_book_id == UserBook.id)
+        .where(UserBook.user_id == current_user.id)
+        .group_by(log_month)
+        .order_by(log_month)
     )
     results = db.execute(stmt).all()
-    return [PagesPerMonth(month=row.month, pages=row.pages) for row in results]
+    raw = [(r.month, r.pages) for r in results]
+
+    if not raw:
+        month_col = month_format_func(UserBook.finished_at)
+        stmt = (
+            select(
+                month_col.label("month"),
+                func.sum(Book.pages).label("pages"),
+            )
+            .join(Book, UserBook.book_id == Book.id)
+            .where(
+                UserBook.user_id == current_user.id,
+                UserBook.status == "COMPLETED",
+                UserBook.finished_at.isnot(None),
+                Book.pages.isnot(None),
+            )
+            .group_by(month_col)
+            .order_by(month_col)
+        )
+        results = db.execute(stmt).all()
+        raw = [(r.month, r.pages) for r in results]
+
+    return _fill_months(raw)
 
 
 @router.get("/favorite-genres", response_model=list[FavoriteGenre])

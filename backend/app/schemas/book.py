@@ -37,6 +37,11 @@ class UserBookOut(BaseModel):
     created_at: datetime
 
 
+class ImportNoteItem(BaseModel):
+    content: str
+    page_number: Optional[int] = None
+
+
 class CreateBookRequest(BaseModel):
     title: str
     author: str
@@ -46,6 +51,19 @@ class CreateBookRequest(BaseModel):
     published_date: Optional[str] = None
     google_books_id: Optional[str] = None
     genre_ids: Optional[list[str]] = None
+    status: Optional[str] = None
+    current_page: Optional[int] = None
+    rating: Optional[float] = None
+    started_at: Optional[datetime] = None
+    finished_at: Optional[datetime] = None
+    notes: Optional[list[ImportNoteItem]] = None
+
+    @field_validator("rating")
+    @classmethod
+    def validate_rating(cls, v: Optional[float]) -> Optional[float]:
+        if v is not None and (v < 1 or v > 5):
+            raise ValueError("Rating must be between 1 and 5")
+        return v
 
 
 class UpdateBookRequest(BaseModel):
@@ -55,6 +73,7 @@ class UpdateBookRequest(BaseModel):
     started_at: Optional[datetime] = None
     finished_at: Optional[datetime] = None
     genre_ids: Optional[list[str]] = None
+    thumbnail: Optional[str] = None
 
     @field_validator("rating")
     @classmethod

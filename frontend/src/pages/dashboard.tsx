@@ -18,14 +18,17 @@ import {
   useFavoriteGenres,
   useTopAuthors,
 } from "../hooks/use-stats";
-import { Card, StatCardSkeleton, EmptyState } from "../components/ui";
+import Card from "../components/ui/card";
+import EmptyState from "../components/ui/empty-state";
+import { StatCardSkeleton } from "../components/ui/skeleton";
 import ChartTooltip, { ChartLegend } from "../components/chart/chart-tooltip";
 import {
-  CHART_COLORS,
+  getChartColors,
   PIE_COLORS,
   STATUS_COLORS,
-  CHART_AXIS_STYLES,
+  getChartAxisStyles,
 } from "../components/chart/chart-theme";
+import { useTheme } from "../hooks/use-theme";
 import type { OverviewStats } from "../types/stats";
 
 interface MetricDef {
@@ -101,6 +104,7 @@ function SectionCard({ title, children, decorative }: SectionCardProps) {
 }
 
 export default function Dashboard() {
+  const { isDark } = useTheme();
   const { data: overview, isLoading: overviewLoading } = useOverviewStats();
   const { data: pagesPerMonth, isLoading: pagesLoading } = usePagesPerMonth();
   const { data: favoriteGenres, isLoading: genresLoading } =
@@ -109,6 +113,9 @@ export default function Dashboard() {
 
   const loading =
     overviewLoading || pagesLoading || genresLoading || authorsLoading;
+
+  const colors = getChartColors();
+  const axisStyles = getChartAxisStyles();
 
   const statusData = overview
     ? [
@@ -152,18 +159,18 @@ export default function Dashboard() {
                   >
                     <CartesianGrid
                       strokeDasharray="3 3"
-                      stroke={CHART_COLORS.hairline}
+                      stroke={colors.hairline}
                     />
-                    <XAxis dataKey="month" {...CHART_AXIS_STYLES} />
-                    <YAxis {...CHART_AXIS_STYLES} />
+                    <XAxis dataKey="month" {...axisStyles} />
+                    <YAxis {...axisStyles} />
                     <Tooltip content={<ChartTooltip unit="págs" />} />
                     <Line
                       type="monotone"
                       dataKey="pages"
-                      stroke={CHART_COLORS.ink}
+                      stroke={colors.muted}
                       strokeWidth={2}
-                      dot={{ fill: CHART_COLORS.ink, strokeWidth: 0, r: 4 }}
-                      activeDot={{ r: 6, fill: CHART_COLORS.ink }}
+                      dot={{ fill: colors.muted, strokeWidth: 0, r: 4 }}
+                      activeDot={{ r: 6, fill: colors.muted }}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -182,14 +189,15 @@ export default function Dashboard() {
                   >
                     <CartesianGrid
                       strokeDasharray="3 3"
-                      stroke={CHART_COLORS.hairline}
+                      stroke={colors.hairline}
                       horizontal={false}
                     />
-                    <XAxis type="number" {...CHART_AXIS_STYLES} />
+                    <XAxis type="number" {...axisStyles} />
                     <YAxis
+                      key={isDark ? "dark" : "light"}
                       dataKey="author"
                       type="category"
-                      tick={{ fontSize: 12, fill: CHART_COLORS.ink }}
+                      tick={{ fontSize: 12, fill: colors.muted }}
                       axisLine={false}
                       tickLine={false}
                       width={120}
@@ -197,7 +205,7 @@ export default function Dashboard() {
                     <Tooltip content={<ChartTooltip unit="libros" />} />
                     <Bar
                       dataKey="count"
-                      fill={CHART_COLORS.ink}
+                      fill={colors.muted}
                       radius={[0, 4, 4, 0]}
                       barSize={20}
                     />
@@ -207,7 +215,7 @@ export default function Dashboard() {
             </SectionCard>
           ) : (
             <Card className="p-6">
-              <h2 className="font-display text-title-md text-ink mb-4">
+              <h2 className="font-display text-title-md text-muted mb-4">
                 Autores más leídos
               </h2>
               <EmptyState

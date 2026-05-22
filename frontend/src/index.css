@@ -46,28 +46,6 @@
   --color-on-dark-soft: #777169;
 }
 
-::view-transition-group(root) {
-  animation-timing-function: var(--expo-out);
-}
-::view-transition-new(root) {
-  mask: url("/custom-svg.svg") top left / 0 no-repeat;
-  mask-origin: top left;
-  animation: theme-scale 1.5s;
-  animation-fill-mode: both;
-}
-::view-transition-old(root),
-.dark::view-transition-old(root) {
-  animation: theme-scale 1.5s;
-  animation-fill-mode: both;
-  z-index: -1;
-  transform-origin: top left;
-}
-@keyframes theme-scale {
-  to {
-    mask-size: 200vmax;
-  }
-}
-
 :root {
   --expo-in: linear(
     0 0%,
@@ -107,6 +85,46 @@
   );
 }
 
+/* ---- View Transitions - Polygon Gradient ---- */
+::view-transition-group(root) {
+  animation-duration: 0.7s;
+  animation-timing-function: var(--expo-out);
+}
+
+::view-transition-new(root) {
+  animation-name: reveal-light;
+  animation-fill-mode: both;
+}
+
+::view-transition-old(root),
+.dark::view-transition-old(root) {
+  animation: none;
+  animation-fill-mode: both;
+  z-index: -1;
+}
+.dark::view-transition-new(root) {
+  animation-name: reveal-dark;
+  animation-fill-mode: both;
+}
+
+@keyframes reveal-dark {
+  from {
+    clip-path: polygon(50% -71%, -50% 71%, -50% 71%, 50% -71%);
+  }
+  to {
+    clip-path: polygon(50% -71%, -50% 71%, 50% 171%, 171% 50%);
+  }
+}
+
+@keyframes reveal-light {
+  from {
+    clip-path: polygon(171% 50%, 50% 171%, 50% 171%, 171% 50%);
+  }
+  to {
+    clip-path: polygon(171% 50%, 50% 171%, -50% 71%, 50% -71%);
+  }
+}
+
 *,
 *::before,
 *::after {
@@ -115,3 +133,5 @@
     border-color 0.2s ease,
     color 0.2s ease;
 }
+
+

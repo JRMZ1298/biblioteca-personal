@@ -6,7 +6,8 @@ import ProgressBar from "../components/book/progress-bar";
 import Rating from "../components/book/rating";
 import Notes from "../components/book/notes";
 import GenreSelect from "../components/ui/genre-select";
-import { Spinner, Button } from "../components/ui";
+import Spinner from "../components/ui/spinner";
+import Button from "../components/ui/button";
 import { toastSuccess, toastError } from "../lib/toast";
 import type { ReadingStatus } from "../types/book";
 
@@ -33,6 +34,7 @@ export default function BookDetail() {
   const [currentPage, setCurrentPage] = useState<number | null>(null);
   const [rating, setRating] = useState<number | null>(null);
   const [genreIds, setGenreIds] = useState<string[]>([]);
+  const [thumbnail, setThumbnail] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -41,6 +43,7 @@ export default function BookDetail() {
       setCurrentPage(userBook.current_page);
       setRating(userBook.rating);
       setGenreIds(userBook.book.genres.map((g) => g.id));
+      setThumbnail(userBook.book.thumbnail);
     }
   }, [userBook]);
 
@@ -49,6 +52,7 @@ export default function BookDetail() {
     (status !== userBook.status ||
       currentPage !== userBook.current_page ||
       rating !== userBook.rating ||
+      thumbnail !== userBook.book.thumbnail ||
       genreIds.join() !== userBook.book.genres.map((g) => g.id).join());
 
   const handleSave = useCallback(async () => {
@@ -62,6 +66,7 @@ export default function BookDetail() {
           current_page: currentPage ?? undefined,
           rating: rating ?? undefined,
           genre_ids: genreIds,
+          thumbnail: thumbnail ?? undefined,
           ...(status === "COMPLETED" ? {} : { finished_at: undefined }),
           ...(status === "READING" && !userBook?.started_at
             ? { started_at: new Date().toISOString() }
@@ -95,7 +100,10 @@ export default function BookDetail() {
     }
   };
 
-  const handleCreateNote = async (data: { content: string; page_number: number | null }) => {
+  const handleCreateNote = async (data: {
+    content: string;
+    page_number: number | null;
+  }) => {
     try {
       await createNote.mutateAsync(data);
       toastSuccess("Nota agregada");
@@ -149,30 +157,43 @@ export default function BookDetail() {
       </button>
 
       <div className="flex flex-col sm:flex-row gap-6">
-        <div className="shrink-0 w-full sm:w-48 h-72 bg-surface-strong rounded-xl overflow-hidden">
-          {book.thumbnail ? (
-            <img
-              src={book.thumbnail}
-              alt={book.title}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted-soft">
-              <svg
-                className="w-12 h-12"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
-                />
-              </svg>
-            </div>
-          )}
+        <div className="shrink-0 w-full sm:w-48">
+          <div className="h-72 bg-surface-strong rounded-xl overflow-hidden mb-2">
+            {thumbnail ? (
+              <img
+                src={thumbnail}
+                alt={book.title}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = "none";
+                }}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-muted-soft">
+                <svg
+                  className="w-12 h-12"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
+                  />
+                </svg>
+              </div>
+            )}
+          </div>
+          <input
+            type="text"
+            value={thumbnail ?? ""}
+            onChange={(e) => setThumbnail(e.target.value || null)}
+            placeholder="URL de la portada…"
+            aria-label="URL de la portada del libro"
+            className="w-full rounded-lg border border-hairline bg-transparent px-3 py-1.5 text-caption text-ink placeholder:text-muted-soft focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow"
+          />
         </div>
 
         <div className="flex-1 min-w-0 space-y-4">
@@ -190,7 +211,7 @@ export default function BookDetail() {
                 onClick={() => setStatus(opt.value)}
                 className={`rounded-pill px-3.5 py-1.5 text-caption-uppercase transition-colors ${
                   status === opt.value
-                    ? "bg-primary text-white"
+                    ? "bg-primary text-highlight"
                     : "bg-surface-strong text-muted hover:text-ink"
                 }`}
               >

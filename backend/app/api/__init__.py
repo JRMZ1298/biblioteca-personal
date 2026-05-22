@@ -5,12 +5,16 @@ from app.api.stats import router as stats_router
 from app.api.google_books import router as google_books_router
 from app.api.genres import router as genres_router
 from app.api.notes import router as notes_router
+from app.api.export_import import router as export_import_router
+from app.api.reading_logs import router as reading_logs_router
 
 api_router = APIRouter()
 
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
+api_router.include_router(export_import_router, prefix="/books", tags=["export-import"])
 api_router.include_router(books_router, prefix="/books", tags=["books"])
 api_router.include_router(stats_router, prefix="/stats", tags=["stats"])
 api_router.include_router(google_books_router, prefix="/google-books", tags=["google-books"])
 api_router.include_router(genres_router, prefix="/genres", tags=["genres"])
 api_router.include_router(notes_router, tags=["notes"])
+api_router.include_router(reading_logs_router, prefix="/books", tags=["reading-logs"])

@@ -4,13 +4,13 @@ import { AnimatePresence, motion } from "motion/react";
 import { useBooks } from "../hooks/use-books";
 import BookCard from "../components/book/book-card";
 import BookForm from "../components/book/book-form";
-import {
-  Modal,
-  EmptyState,
-  Button,
-  Input,
-  BookCardSkeleton,
-} from "../components/ui";
+import BookExport from "../components/book/book-export";
+import BookImportWizard from "../components/book/book-import-wizard";
+import Modal from "../components/ui/modal";
+import EmptyState from "../components/ui/empty-state";
+import Button from "../components/ui/button";
+import Input from "../components/ui/input";
+import { BookCardSkeleton } from "../components/ui/skeleton";
 import type { ReadingStatus, UserBook } from "../types/book";
 
 type SortKey = "title" | "pages" | "created_at";
@@ -74,7 +74,11 @@ export default function Library() {
     <div className="mx-auto max-w-5xl px-4 lg:px-6 py-6 lg:py-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <h1 className="font-display text-display-sm text-ink">Biblioteca</h1>
-        <Button onClick={() => setShowForm(true)}>Agregar libro</Button>
+        <div className="flex items-center gap-2">
+          <BookExport />
+          <BookImportWizard />
+          <Button onClick={() => setShowForm(true)}>Agregar libro</Button>
+        </div>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4 mb-6">

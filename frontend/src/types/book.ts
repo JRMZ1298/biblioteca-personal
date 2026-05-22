@@ -63,4 +63,5 @@ export interface UpdateBookRequest {
   started_at?: string
   finished_at?: string
   genre_ids?: string[]
+  thumbnail?: string
 }

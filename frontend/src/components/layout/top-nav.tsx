@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/use-auth";
 import { useTheme } from "../../hooks/use-theme";
-import { Button } from "../ui";
+import Button from "../ui/button";
 
 export default function TopNav() {
   const { user, logout } = useAuth();

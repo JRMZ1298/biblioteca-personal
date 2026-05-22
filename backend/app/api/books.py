@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session, selectinload
 from sqlalchemy import select, delete
@@ -8,6 +9,8 @@ from app.models.user import User
 from app.models.book import Book
 from app.models.user_book import UserBook
 from app.models.book_genre import BookGenre
+from app.models.note import Note
+from app.models.reading_log import ReadingLog
 from app.schemas.book import CreateBookRequest, UpdateBookRequest, UserBookOut, BookOut
 
 router = APIRouter()
@@ -79,6 +82,20 @@ def create_book(
         db.add(book)
         db.flush()
 
+    if data.current_page is not None and book.pages is not None:
+        if data.current_page > book.pages:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Current page ({data.current_page}) cannot exceed total pages ({book.pages})",
+            )
+
+    target_status = data.status if data.status is not None else "PENDING"
+    if data.finished_at is not None and target_status != "COMPLETED":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="finished_at can only be set when status is COMPLETED",
+        )
+
     if data.genre_ids:
         stmt = select(BookGenre).where(
             BookGenre.c.book_id == book.id,
@@ -92,9 +109,24 @@ def create_book(
     user_book = UserBook(
         user_id=current_user.id,
         book_id=book.id,
-        status="PENDING",
+        status=target_status,
+        current_page=data.current_page,
+        rating=data.rating,
+        started_at=data.started_at,
+        finished_at=data.finished_at,
     )
     db.add(user_book)
+    db.flush()
+
+    if data.notes:
+        for n in data.notes:
+            note = Note(
+                content=n.content,
+                page_number=n.page_number,
+                user_book_id=user_book.id,
+            )
+            db.add(note)
+
     db.commit()
     db.refresh(user_book)
     db.refresh(book, ["genres"])
@@ -138,9 +170,39 @@ def update_book(
 
     update_data = data.model_dump(exclude_unset=True)
     genre_ids = update_data.pop("genre_ids", None)
+    thumbnail = update_data.pop("thumbnail", None)
 
+    old_page = user_book.current_page or 0
+    old_status = user_book.status
     for field, value in update_data.items():
         setattr(user_book, field, value)
+
+    just_completed = old_status != "COMPLETED" and target_status == "COMPLETED"
+
+    if "current_page" in update_data and not just_completed:
+        new_page = user_book.current_page or 0
+        delta = new_page - old_page
+        if delta > 0:
+            log = ReadingLog(
+                user_book_id=user_book.id,
+                pages_read=delta,
+                date=datetime.now(timezone.utc).date(),
+            )
+            db.add(log)
+
+    if just_completed and user_book.book.pages:
+        remaining = user_book.book.pages - (user_book.current_page or 0)
+        if remaining > 0:
+            log = ReadingLog(
+                user_book_id=user_book.id,
+                pages_read=remaining,
+                date=datetime.now(timezone.utc).date(),
+            )
+            db.add(log)
+            user_book.current_page = user_book.book.pages
+
+    if thumbnail is not None:
+        user_book.book.thumbnail = thumbnail
 
     if genre_ids is not None:
         db.execute(
