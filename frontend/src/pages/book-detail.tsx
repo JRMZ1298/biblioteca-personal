@@ -205,26 +205,42 @@ export default function BookDetail() {
           </div>
 
           <div className="flex gap-1.5 flex-wrap">
-            {statusOptions.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => setStatus(opt.value)}
-                className={`rounded-pill px-3.5 py-1.5 text-caption-uppercase transition-colors ${
-                  status === opt.value
-                    ? "bg-primary text-highlight"
-                    : "bg-surface-strong text-muted hover:text-ink"
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
+            {statusOptions.map((opt) => {
+              const isCompleted = status === "COMPLETED"
+              const isBlocked = isCompleted && opt.value !== "COMPLETED"
+              return (
+                <button
+                  key={opt.value}
+                  onClick={() => {
+                    if (isBlocked) return
+                    if (opt.value === "COMPLETED" && totalPages > 0) {
+                      setCurrentPage(totalPages)
+                    }
+                    setStatus(opt.value)
+                  }}
+                  className={`rounded-pill px-3.5 py-1.5 text-caption-uppercase transition-colors ${
+                    status === opt.value
+                      ? "bg-primary text-highlight"
+                      : isBlocked
+                        ? "bg-surface-strong text-muted-soft cursor-not-allowed"
+                        : "bg-surface-strong text-muted hover:text-ink"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              )
+            })}
           </div>
 
           {status !== "PENDING" && totalPages > 0 && (
             <ProgressBar
               current={currentPage}
               total={totalPages}
-              onChange={setCurrentPage}
+              onChange={(page) => {
+                if (page >= (userBook.current_page ?? 0)) {
+                  setCurrentPage(page)
+                }
+              }}
             />
           )}
 

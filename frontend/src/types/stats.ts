@@ -8,11 +8,6 @@ export interface OverviewStats {
   avg_reading_days: number
 }
 
-export interface PagesPerMonth {
-  month: string
-  pages: number
-}
-
 export interface FavoriteGenre {
   genre: string
   count: number

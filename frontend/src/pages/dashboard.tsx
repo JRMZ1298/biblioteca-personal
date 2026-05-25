@@ -1,6 +1,4 @@
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -14,7 +12,6 @@ import {
 } from "recharts";
 import {
   useOverviewStats,
-  usePagesPerMonth,
   useFavoriteGenres,
   useTopAuthors,
 } from "../hooks/use-stats";
@@ -47,7 +44,6 @@ const metrics: MetricDef[] = [
   { key: "reading_books", label: "Leyendo", color: "text-amber-500" },
   { key: "pending_books", label: "Pendientes", color: "text-blue-500" },
   { key: "total_pages", label: "Páginas leídas", color: "text-ink" },
-  { key: "avg_reading_days", label: "Prom. días lectura", color: "text-muted" },
   {
     key: "avg_pages_per_book",
     label: "Prom. páginas/libro",
@@ -77,25 +73,12 @@ function StatCard({
 interface SectionCardProps {
   title: string;
   children: React.ReactNode;
-  decorative?: boolean;
 }
 
-function SectionCard({ title, children, decorative }: SectionCardProps) {
+function SectionCard({ title, children }: SectionCardProps) {
   return (
-    <Card
-      className={`relative overflow-hidden p-6 ${decorative ? "isolate" : ""}`}
-    >
-      {decorative && (
-        <div
-          className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full opacity-15"
-          style={{
-            background:
-              "radial-gradient(circle, #a7e5d3 0%, #c8b8e0 40%, #f4c5a8 70%, transparent 100%)",
-          }}
-          aria-hidden="true"
-        />
-      )}
-      <div className="relative">
+    <Card className="relative overflow-hidden p-6">
+      <div>
         <h2 className="font-display text-title-md text-ink mb-4">{title}</h2>
         {children}
       </div>
@@ -106,13 +89,12 @@ function SectionCard({ title, children, decorative }: SectionCardProps) {
 export default function Dashboard() {
   const { isDark } = useTheme();
   const { data: overview, isLoading: overviewLoading } = useOverviewStats();
-  const { data: pagesPerMonth, isLoading: pagesLoading } = usePagesPerMonth();
   const { data: favoriteGenres, isLoading: genresLoading } =
     useFavoriteGenres();
   const { data: topAuthors, isLoading: authorsLoading } = useTopAuthors();
 
   const loading =
-    overviewLoading || pagesLoading || genresLoading || authorsLoading;
+    overviewLoading || genresLoading || authorsLoading;
 
   const colors = getChartColors();
   const axisStyles = getChartAxisStyles();
@@ -130,14 +112,14 @@ export default function Dashboard() {
       <h1 className="font-display text-display-sm text-ink">Estadísticas</h1>
 
       {loading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
-          {Array.from({ length: 7 }).map((_, i) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          {Array.from({ length: 6 }).map((_, i) => (
             <StatCardSkeleton key={i} />
           ))}
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {overview &&
               metrics.map((m) => (
                 <StatCard
@@ -148,35 +130,6 @@ export default function Dashboard() {
                 />
               ))}
           </div>
-
-          {pagesPerMonth && pagesPerMonth.length > 0 && (
-            <SectionCard title="Páginas por mes" decorative>
-              <div className="h-72">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={pagesPerMonth}
-                    margin={{ top: 8, right: 8, bottom: 8, left: -16 }}
-                  >
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke={colors.hairline}
-                    />
-                    <XAxis dataKey="month" {...axisStyles} />
-                    <YAxis {...axisStyles} />
-                    <Tooltip content={<ChartTooltip unit="págs" />} />
-                    <Line
-                      type="monotone"
-                      dataKey="pages"
-                      stroke={colors.muted}
-                      strokeWidth={2}
-                      dot={{ fill: colors.muted, strokeWidth: 0, r: 4 }}
-                      activeDot={{ r: 6, fill: colors.muted }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </SectionCard>
-          )}
 
           {topAuthors && topAuthors.length > 0 ? (
             <SectionCard title="Autores más leídos">

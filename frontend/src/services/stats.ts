@@ -1,13 +1,8 @@
 import api from './api'
-import type { OverviewStats, PagesPerMonth, FavoriteGenre, TopAuthor } from '../types/stats'
+import type { OverviewStats, FavoriteGenre, TopAuthor } from '../types/stats'
 
 export async function getOverviewStats(): Promise<OverviewStats> {
   const res = await api.get('/stats/overview')
-  return res.data
-}
-
-export async function getPagesPerMonth(): Promise<PagesPerMonth[]> {
-  const res = await api.get('/stats/pages-per-month')
   return res.data
 }
 

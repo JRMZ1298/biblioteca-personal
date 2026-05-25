@@ -1,4 +1,3 @@
-from datetime import date
 from pydantic import BaseModel
 
 
@@ -10,11 +9,6 @@ class OverviewStats(BaseModel):
     pending_books: int
     avg_pages_per_book: float
     avg_reading_days: float
-
-
-class PagesPerMonth(BaseModel):
-    month: str
-    pages: int
 
 
 class FavoriteGenre(BaseModel):

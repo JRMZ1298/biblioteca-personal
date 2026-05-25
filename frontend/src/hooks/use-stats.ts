@@ -8,13 +8,6 @@ export function useOverviewStats() {
   })
 }
 
-export function usePagesPerMonth() {
-  return useQuery({
-    queryKey: ['stats', 'pages-per-month'],
-    queryFn: () => statsService.getPagesPerMonth(),
-  })
-}
-
 export function useFavoriteGenres() {
   return useQuery({
     queryKey: ['stats', 'favorite-genres'],
